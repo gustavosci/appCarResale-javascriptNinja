@@ -14,10 +14,11 @@
 			nodeActual.removeEventListener(eve, action, false);
 		})
 	}
-	DOM.prototype.get = function get(){
-		return Array.prototype.map.call(this.element, function(nodeActual){
-			return nodeActual;
-		})
+	DOM.prototype.get = function get(index){
+		if( !index )
+			return this.element[0];
+		else
+			return this.element[index];
 	} 
 	DOM.prototype.forEach = function forEach(){
 		return Array.prototype.forEach.apply(this.element, arguments);
