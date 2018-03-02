@@ -4,26 +4,33 @@
   function app(){
     var $spamCompanyData = new DOM('[data-js="spamCompanyData"');
     var $formCadastro = new DOM('[data-js="formCadastro"');
-    var $tableResult = new DOM('[data-js="tableResult"');
+    var $tbodyResult = new DOM('[data-js="tbodyResult"');
     var $inputs = new DOM('input');
     var ajax = new XMLHttpRequest();
+    var idCar = 0;
 
-    $formCadastro.get().addEventListener("submit", handleFormSubmit, false);
+    $formCadastro.get().addEventListener("submit", handleFormSubmit, false);    
     setInfoCompany();
 
     function handleFormSubmit(eve){
       eve.preventDefault();
-
-      var docFragment = doc.createDocumentFragment();
-      var newTR = doc.createElement("tr");      
-      $inputs.forEach(function(element){
-        var newTD = appendColumnOnTable(element);
-        newTR.appendChild(newTD);  
-      });
-      docFragment.appendChild(newTR);
-      $tableResult.get().firstElementChild.appendChild(docFragment);
-
+      idCar += 1;
+      insertCarAtTable();      
       clearForm();
+    }
+
+    function insertCarAtTable(){
+      var docFragment = doc.createDocumentFragment();
+      var newTR = doc.createElement("tr");  
+      newTR.setAttribute("id", idCar);   
+      newTR.setAttribute("data-js", "trResult");      
+      $inputs.forEach(function(element){
+        newTR.appendChild(appendColumnOnTable(element));  
+      });            ;
+      newTR.appendChild(appendButtonRemove(idCar));        
+      docFragment.appendChild(newTR);
+      $tbodyResult.get().appendChild(docFragment);
+      insertEventsButtonsRemove();
     }
 
     function appendColumnOnTable(element){
@@ -50,12 +57,40 @@
     }
 
     function appendTextColumnOnTable(newText){      
-      var newTD = doc.createElement("td");
+      var newTD = doc.createElement("td");      
       if( !newText )
         newText = "-";
       var newContentTD = doc.createTextNode(newText);
       newTD.appendChild(newContentTD);
       return newTD;
+    }
+
+    function appendButtonRemove(idCar){
+      var newTD = doc.createElement("td");
+      var newButton = doc.createElement("button");
+      newButton.setAttribute("data-js", "btnRemove");
+      newButton.setAttribute("id", idCar);
+      newButton.textContent = "Remover";
+      newTD.appendChild(newButton);
+      return newTD;
+    }
+
+    function insertEventsButtonsRemove(){
+      var $buttonsRemove = new DOM('[data-js=btnRemove]');
+      $buttonsRemove.off("click", handleButtonRemove);
+      $buttonsRemove.on("click", handleButtonRemove);
+    }
+
+    function handleButtonRemove(eve){
+      eve.preventDefault();    
+      var id = eve.toElement.getAttribute("id");
+      var $trResult = new DOM('[data-js="trResult"');
+      $trResult.forEach(function(element){
+        if(element.getAttribute("id") === id){
+          $tbodyResult.get().removeChild(element);
+          return
+        }
+      });                  
     }
 
     function clearForm(){
